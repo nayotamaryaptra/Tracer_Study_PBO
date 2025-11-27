@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Dashboard Tracer Study</h2>
+
+<div class="row g-4">
+
+    <div class="col-md-3">
+        <div class="card shadow-sm p-3">
+            <div class="small text-muted">Total Alumni</div>
+            <div class="h3">{{ total_alumni }}</div>
+            <a href="/alumni/" class="btn btn-sm btn-primary mt-2">Lihat</a>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm p-3">
+            <div class="small text-muted">Total Survey</div>
+            <div class="h3">{{ total_survey }}</div>
+            <a href="/survey/" class="btn btn-sm btn-primary mt-2">Lihat</a>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm p-3">
+            <div class="small text-muted">Persentase Bekerja</div>
+            <div class="h3">{{ persentase_bekerja }}%</div>
+            <a href="/statistik/" class="btn btn-sm btn-primary mt-2">Detail</a>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm p-3">
+            <div class="small text-muted">Rata-rata Gaji</div>
+            <div class="h3">Rp {{ rata_gaji|intcomma }}</div>
+            <a href="/statistik/" class="btn btn-sm btn-primary mt-2">Detail</a>
+        </div>
+    </div>
+
+</div>
+
+<hr class="my-4">
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <a href="/alumni/" class="text-decoration-none">
+            <div class="card p-4 shadow-sm text-center bg-white">
+                <h4>🎓 Alumni</h4>
+                <p class="text-muted mt-2">Kelola data alumni</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-4">
+        <a href="/survey/" class="text-decoration-none">
+            <div class="card p-4 shadow-sm text-center bg-white">
+                <h4>📋 Survey</h4>
+                <p class="text-muted mt-2">Input & analisa hasil tracer</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-4">
+        <a href="/feedback/" class="text-decoration-none">
+            <div class="card p-4 shadow-sm text-center bg-white">
+                <h4>💬 Feedback</h4>
+                <p class="text-muted mt-2">Saran & evaluasi alumni</p>
+            </div>
+        </a>
+    </div>
+</div>
+
+{% endblock %}

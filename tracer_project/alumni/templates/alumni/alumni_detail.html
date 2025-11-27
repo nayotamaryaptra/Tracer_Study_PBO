@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Detail Alumni{% endblock %}
+
+{% block content %}
+<h2>Detail Alumni</h2>
+<hr>
+
+<ul class="list-group">
+    <li class="list-group-item"><strong>NIM:</strong> {{ alumni.nim }}</li>
+    <li class="list-group-item"><strong>Nama:</strong> {{ alumni.nama }}</li>
+    <li class="list-group-item"><strong>Prodi:</strong> {{ alumni.prodi }}</li>
+    <li class="list-group-item"><strong>Tahun Lulus:</strong> {{ alumni.tahun_lulus }}</li>
+    <li class="list-group-item"><strong>Email:</strong> {{ alumni.email }}</li>
+    <li class="list-group-item"><strong>Status:</strong> {{ alumni.status }}</li>
+</ul>
+
+<a href="{% url 'alumni_list' %}" class="btn btn-secondary mt-3">Kembali</a>
+{% endblock %}

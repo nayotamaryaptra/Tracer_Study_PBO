@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Survey{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+    <h2>Hasil Survey Alumni</h2>
+    <a href="{% url 'survey_create' %}" class="btn btn-primary">+ Tambah Survey</a>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-primary">
+        <tr>
+            <th>Alumni</th>
+            <th>Status Kerja</th>
+            <th>Waktu Tunggu</th>
+            <th>Jenis Perusahaan</th>
+            <th>Gaji</th>
+            <th>Kesesuaian</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for s in survey_list %}
+        <tr>
+            <td>{{ s.alumni.nama }}</td>
+            <td>{{ s.status_pekerjaan }}</td>
+            {% if s.waktu_tunggu %}<td>{{ s.waktu_tunggu }} bulan</td>{% else %}<td>-</td>{% endif %}
+            <td>{{ s.jenis_perusahaan|default:"-" }}</td>
+            <td>{% if s.gaji %}Rp {{ s.gaji|intcomma }}{% else %}-{% endif %}</td>
+            <td>{{ s.kesesuaian_jurusan }}</td>
+            <td>
+                <a href="{% url 'survey_edit' s.id %}" class="btn btn-sm btn-warning">Edit</a>
+                <a href="{% url 'survey_delete' s.id %}" class="btn btn-sm btn-danger">Hapus</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-center">Belum ada data survey.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

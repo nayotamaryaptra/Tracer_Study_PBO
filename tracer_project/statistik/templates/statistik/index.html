@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Statistik Tracer Study{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Statistik Tracer Study</h2>
+
+<div class="row g-3">
+
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+            <div class="small text-muted">Total Responden</div>
+            <div class="h3">{{ total_responden }}</div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+            <div class="small text-muted">Persentase Bekerja</div>
+            <div class="h3">{{ persentase_bekerja }}%</div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+            <div class="small text-muted">Rata-rata Gaji</div>
+            <div class="h3">Rp {{ rata_gaji|intcomma }}</div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+            <div class="small text-muted">Rata Waktu Tunggu</div>
+            <div class="h3">{{ rata_waktu_tunggu }} bulan</div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-4">
+
+<h4>Distribusi Status Pekerjaan</h4>
+<canvas id="chartStatus" height="100"></canvas>
+
+<hr class="my-4">
+
+<h4>Distribusi Kesesuaian Jurusan</h4>
+<canvas id="chartKesesuaian" height="100"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// ----- STATUS PEKERJAAN -----
+const statusLabels = [
+    {% for item in status_pekerjaan %}
+        "{{ item.status_pekerjaan }}",
+    {% endfor %}
+];
+
+const statusData = [
+    {% for item in status_pekerjaan %}
+        {{ item.total }},
+    {% endfor %}
+];
+
+new Chart(document.getElementById("chartStatus"), {
+    type: "bar",
+    data: {
+        labels: statusLabels,
+        datasets: [{
+            label: "Jumlah",
+            data: statusData,
+        }]
+    }
+});
+
+// ----- KESESUAIAN -----
+const kesesuaianLabels = [
+    {% for item in kesesuaian %}
+        "{{ item.kesesuaian_jurusan }}",
+    {% endfor %}
+];
+
+const kesesuaianData = [
+    {% for item in kesesuaian %}
+        {{ item.total }},
+    {% endfor %}
+];
+
+new Chart(document.getElementById("chartKesesuaian"), {
+    type: "pie",
+    data: {
+        labels: kesesuaianLabels,
+        datasets: [{
+            data: kesesuaianData,
+        }]
+    }
+});
+</script>
+
+{% endblock %}

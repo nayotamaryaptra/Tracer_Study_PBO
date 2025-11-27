@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>Hapus Feedback</h3>
+<p>Hapus feedback dari <strong>{{ feedback.alumni.nama }}</strong>?</p>
+
+<form method="POST">
+    {% csrf_token %}
+    <button class="btn btn-danger">Hapus</button>
+    <a href="{% url 'feedback_list' %}" class="btn btn-secondary">Batal</a>
+</form>
+{% endblock %}

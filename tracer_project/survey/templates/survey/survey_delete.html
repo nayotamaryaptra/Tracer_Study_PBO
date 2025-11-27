@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>Hapus Survey</h3>
+<p>Yakin ingin menghapus survey dari <strong>{{ survey.alumni.nama }}</strong>?</p>
+
+<form method="POST">
+    {% csrf_token %}
+    <button class="btn btn-danger">Hapus</button>
+    <a href="{% url 'survey_list' %}" class="btn btn-secondary">Batal</a>
+</form>
+{% endblock %}

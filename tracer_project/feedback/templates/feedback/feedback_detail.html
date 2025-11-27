@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Detail Feedback</h2>
+<hr>
+
+<ul class="list-group">
+    <li class="list-group-item"><strong>Alumni:</strong> {{ feedback.alumni.nama }}</li>
+    <li class="list-group-item"><strong>Kurikulum:</strong> {{ feedback.rating_kurikulum }}</li>
+    <li class="list-group-item"><strong>Pengajar:</strong> {{ feedback.rating_pengajar }}</li>
+    <li class="list-group-item"><strong>Relevansi:</strong> {{ feedback.rating_relevansi }}</li>
+    <li class="list-group-item"><strong>Komentar:</strong> {{ feedback.komentar }}</li>
+    <li class="list-group-item"><strong>Saran:</strong> {{ feedback.saran|default:"-" }}</li>
+    <li class="list-group-item"><strong>Tanggal:</strong> {{ feedback.tanggal_input|date:"d M Y H:i" }}</li>
+</ul>
+
+<a href="{% url 'feedback_list' %}" class="btn btn-secondary mt-3">Kembali</a>
+{% endblock %}
