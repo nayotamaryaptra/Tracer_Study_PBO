@@ -8,11 +8,11 @@
             <div class="card-header bg-success text-white border-0 py-4 px-4 bg-gradient">
                 <div class="d-flex align-items-center">
                     <div class="bg-white bg-opacity-25 rounded-circle p-3 me-3">
-                        <i class="bi bi-chat-left-text-fill fs-3 text-white"></i>
+                        <i class="bi bi-heart-fill fs-3 text-white"></i>
                     </div>
                     <div>
-                        <h4 class="fw-bold mb-1">{{ title|default:"Form Masukan Kurikulum" }}</h4>
-                        <p class="mb-0 small text-white-50">Pendapat Anda bersifat rahasia dan membangun.</p>
+                        <h4 class="fw-bold mb-1">{{ title|default:"Sampaikan Aspirasi" }}</h4>
+                        <p class="mb-0 small text-white-50">Suara Anda penting untuk perbaikan kualitas kampus.</p>
                     </div>
                 </div>
             </div>
@@ -23,10 +23,10 @@
                     
                     {{ form|crispy }}
 
-                    <div class="d-flex justify-content-end gap-2 mt-5 pt-3 border-top">
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
                         <a href="{% url 'feedback:list' %}" class="btn btn-light px-4 rounded-pill">Batal</a>
                         <button type="submit" class="btn btn-success px-5 rounded-pill shadow">
-                            <i class="bi bi-paperplane-fill me-2"></i> Kirim Masukan
+                            <i class="bi bi-send-fill me-2"></i> Kirim Aspirasi
                         </button>
                     </div>
                 </form>

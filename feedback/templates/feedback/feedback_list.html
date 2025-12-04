@@ -4,21 +4,12 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h2 class="fw-bold text-success">
-            <i class="bi bi-chat-square-quote-fill"></i> Feedback Kurikulum
-        </h2>
-        <p class="text-muted mb-0">
-            {% if is_admin %}
-                Evaluasi dan masukan alumni terhadap mata kuliah.
-            {% else %}
-                Suara Anda sangat berarti untuk perbaikan kurikulum kami.
-            {% endif %}
-        </p>
+        <h2 class="fw-bold text-success"><i class="bi bi-megaphone-fill"></i> Aspirasi & Feedback</h2>
+        <p class="text-muted mb-0">Sampaikan masukan untuk kemajuan bersama.</p>
     </div>
-    
     {% if not is_admin %}
         <a href="{% url 'feedback:create' %}" class="btn btn-success shadow-sm px-4 rounded-pill">
-            <i class="bi bi-pencil-fill me-1"></i> Beri Masukan Baru
+            <i class="bi bi-plus-lg me-1"></i> Buat Tiket Baru
         </a>
     {% endif %}
 </div>
@@ -27,43 +18,21 @@
 <div class="card border-0 shadow-sm mb-4 bg-white">
     <div class="card-body py-3">
         <form method="get" class="row g-2 align-items-center">
-            <div class="col-auto text-muted fw-bold small">
-                <i class="bi bi-search"></i> FILTER:
-            </div>
-            
+            <div class="col-auto fw-bold text-muted small"><i class="bi bi-funnel-fill"></i> FILTER:</div>
             <div class="col-md-3">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-light border-0"><i class="bi bi-book"></i></span>
-                    <input type="text" name="matkul" class="form-control form-control-sm border-0 bg-light" placeholder="Cari Mata Kuliah..." value="{{ request.GET.matkul|default:'' }}">
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <select name="prodi" class="form-select form-select-sm border-0 bg-light fw-medium">
-                    <option value="">-- Semua Prodi --</option>
-                    {% for p in prodi_list %}
-                        <option value="{{ p.id }}" {% if request.GET.prodi == p.id|stringformat:"i" %}selected{% endif %}>
-                            {{ p.nama }}
-                        </option>
-                    {% endfor %}
+                <select name="kategori" class="form-select form-select-sm border-0 bg-light fw-medium">
+                    <option value="">-- Semua Kategori --</option>
+                    {% for k, label in kategori_list %}<option value="{{ k }}">{{ label }}</option>{% endfor %}
                 </select>
             </div>
-
-            <div class="col-md-2">
-                <select name="tahun" class="form-select form-select-sm border-0 bg-light fw-medium">
-                    <option value="">-- Tahun Lulus --</option>
-                    {% for t in tahun_list %}
-                        <option value="{{ t }}" {% if request.GET.tahun == t|stringformat:"i" %}selected{% endif %}>
-                            {{ t }}
-                        </option>
-                    {% endfor %}
+            <div class="col-md-3">
+                <select name="status" class="form-select form-select-sm border-0 bg-light fw-medium">
+                    <option value="">-- Semua Status --</option>
+                    {% for s, label in status_list %}<option value="{{ s }}">{{ label }}</option>{% endfor %}
                 </select>
             </div>
-
             <div class="col-auto">
-                <button type="submit" class="btn btn-sm btn-success px-3 rounded-pill shadow-sm">
-                    Cari Data
-                </button>
+                <button type="submit" class="btn btn-sm btn-success px-3 rounded-pill shadow-sm">Cari</button>
                 <a href="{% url 'feedback:list' %}" class="btn btn-sm btn-link text-decoration-none text-muted">Reset</a>
             </div>
         </form>
@@ -71,76 +40,94 @@
 </div>
 {% endif %}
 
-<div class="card border-0 shadow rounded-4 overflow-hidden">
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="bg-light text-uppercase small text-muted">
-                <tr>
-                    {% if is_admin %}<th class="py-3 ps-4">Pengirim</th>{% endif %}
-                    <th class="py-3 {% if not is_admin %}ps-4{% endif %}">Mata Kuliah</th>
-                    <th class="py-3 text-center">Penilaian</th>
-                    <th class="py-3" width="35%">Saran & Masukan</th>
-                    <th class="py-3 text-end pe-4">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for f in feedbacks %}
-                <tr>
-                    {% if is_admin %}
-                    <td class="ps-4">
-                        <div class="fw-bold text-dark">{{ f.alumni.nama }}</div>
-                        <small class="text-muted">{{ f.alumni.prodi.nama }}</small>
-                    </td>
+<div class="row g-4">
+    {% for f in feedbacks %}
+    <div class="col-md-6">
+        <div class="card h-100 border-0 shadow-sm rounded-4 hover-shadow position-relative overflow-hidden">
+            <div class="position-absolute top-0 start-0 bottom-0 bg-{{ f.status|yesno:'secondary,warning,success' }}" style="width: 5px;"></div>
+            
+            <div class="card-body p-4 ps-5">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="badge bg-light text-dark border rounded-pill fw-normal">
+                        <i class="bi bi-tag-fill me-1 text-muted"></i> {{ f.get_kategori_display }}
+                    </span>
+                    
+                    {% if f.status == 'pending' %}
+                        <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary rounded-pill">Menunggu</span>
+                    {% elif f.status == 'process' %}
+                        <span class="badge bg-warning bg-opacity-10 text-warning border border-warning rounded-pill">Diproses</span>
+                    {% else %}
+                        <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill">Selesai</span>
                     {% endif %}
+                </div>
 
-                    <td class="{% if not is_admin %}ps-4{% endif %} fw-medium text-dark">
-                        {{ f.mata_kuliah }}
-                    </td>
-
-                    <td class="text-center">
-                        {% if f.kesesuaian == 'Sangat Sesuai' or f.kesesuaian == 'Sangat Baik' %}
-                            <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-3">Sangat Sesuai</span>
-                        {% elif f.kesesuaian == 'Sesuai' or f.kesesuaian == 'Baik' %}
-                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary rounded-pill px-3">Sesuai</span>
-                        {% elif f.kesesuaian == 'Kurang' or f.kesesuaian == 'Cukup' %}
-                            <span class="badge bg-warning bg-opacity-10 text-warning border border-warning rounded-pill px-3">Kurang</span>
+                <h5 class="fw-bold text-dark mb-1">{{ f.mata_kuliah }}</h5>
+                
+                <div class="mb-3 text-warning">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= f.rating %}
+                            <i class="bi bi-star-fill"></i>
                         {% else %}
-                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill px-3">Tidak Sesuai</span>
+                            <i class="bi bi-star text-muted opacity-25"></i>
                         {% endif %}
-                    </td>
+                    {% endfor %}
+                    <span class="text-muted small ms-2">({{ f.rating }}/5)</span>
+                </div>
 
-                    <td class="text-muted fst-italic small">
-                        "{{ f.saran|truncatewords:15 }}"
-                    </td>
+                <p class="text-muted mb-4 bg-light p-3 rounded-3 fst-italic">
+                    "{{ f.saran }}"
+                </p>
 
-                    <td class="text-end pe-4">
-                        {% if not is_admin %}
-                            <a href="{% url 'feedback:edit' f.pk %}" class="btn btn-sm btn-outline-warning border-0" title="Edit">
-                                <i class="bi bi-pencil-square fs-6"></i>
-                            </a>
-                        {% endif %}
-                        <a href="{% url 'feedback:delete' f.pk %}" class="btn btn-sm btn-outline-danger border-0" title="Hapus">
-                            <i class="bi bi-trash fs-6"></i>
-                        </a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="{% if is_admin %}5{% else %}4{% endif %}" class="text-center py-5">
-                        <div class="text-muted opacity-25 mb-2">
-                            <i class="bi bi-chat-square-text" style="font-size: 3rem;"></i>
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
+                            {% if f.is_anonymous %}
+                                <i class="bi bi-incognito text-dark fs-5"></i>
+                            {% else %}
+                                <span class="fw-bold text-primary">{{ f.alumni.nama|slice:":1" }}</span>
+                            {% endif %}
                         </div>
-                        <p class="text-muted mb-0">Belum ada data feedback.</p>
-                        {% if not is_admin %}
-                            <a href="{% url 'feedback:create' %}" class="btn btn-sm btn-success mt-2 rounded-pill">
-                                Tulis Masukan
-                            </a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                        <div class="small">
+                            {% if f.is_anonymous %}
+                                <span class="fw-bold text-dark">Mahasiswa (Anonim)</span>
+                                {% if is_admin %}<br><span class="text-muted fst-italic" style="font-size: 0.7rem;">(Asli: {{ f.alumni.nama }})</span>{% endif %}
+                            {% else %}
+                                <span class="fw-bold text-dark">{{ f.alumni.nama }}</span>
+                                <br><span class="text-muted">{{ f.alumni.prodi.nama }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if is_admin %}
+                    <form method="post" class="d-flex align-items-center">
+                        {% csrf_token %}
+                        <input type="hidden" name="feedback_id" value="{{ f.id }}">
+                        <select name="status" class="form-select form-select-sm border-0 bg-light me-2" style="width: 110px;" onchange="this.form.submit()">
+                            <option value="pending" {% if f.status == 'pending' %}selected{% endif %}>Menunggu</option>
+                            <option value="process" {% if f.status == 'process' %}selected{% endif %}>Proses</option>
+                            <option value="done" {% if f.status == 'done' %}selected{% endif %}>Selesai</option>
+                        </select>
+                        <a href="{% url 'feedback:delete' f.pk %}" class="btn btn-sm btn-outline-danger border-0 rounded-circle"><i class="bi bi-trash"></i></a>
+                    </form>
+                    {% else %}
+                        <div>
+                            <a href="{% url 'feedback:edit' f.pk %}" class="btn btn-sm btn-link text-warning p-0 me-2"><i class="bi bi-pencil-square fs-5"></i></a>
+                            <a href="{% url 'feedback:delete' f.pk %}" class="btn btn-sm btn-link text-danger p-0"><i class="bi bi-trash fs-5"></i></a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <div class="text-muted opacity-50 mb-3"><i class="bi bi-inbox fs-1"></i></div>
+        <p class="text-muted">Belum ada aspirasi yang masuk.</p>
+    </div>
+    {% endfor %}
 </div>
+
+<style>
+    .hover-shadow:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important; transition: all 0.3s ease; }
+</style>
 {% endblock %}

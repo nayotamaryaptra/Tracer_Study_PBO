@@ -4,101 +4,89 @@ from django.contrib import messages
 from .models import Feedback
 from .forms import FeedbackForm
 from alumni.models import Prodi, Alumni
-from django import forms
-
-class FeedbackForm(forms.ModelForm):
-    class Meta:
-        model = Feedback
-        fields = ['mata_kuliah', 'kesesuaian', 'saran']
-
-def is_admin(user):
-    return user.is_staff or user.is_superuser
 
 @login_required
 def feedback_list(request):
-    # ADMIN: Lihat Semua + Filter (Matkul, Prodi, Tahun) - NO Jurusan
+    # ADMIN: Bisa Update Status via POST
+    if request.method == 'POST' and request.user.is_staff:
+        feedback_id = request.POST.get('feedback_id')
+        new_status = request.POST.get('status')
+        if feedback_id and new_status:
+            fb = get_object_or_404(Feedback, id=feedback_id)
+            fb.status = new_status
+            fb.save()
+            messages.success(request, f"Status tiket #{fb.id} diperbarui.")
+            return redirect('feedback:list')
+
+    # ADMIN VIEW (Filter + All Data)
     if request.user.is_staff:
-        feedbacks = Feedback.objects.select_related('alumni', 'alumni__prodi').all()
+        feedbacks = Feedback.objects.select_related('alumni', 'alumni__prodi').all().order_by('-created_at')
         
-        # Filter
-        matkul = request.GET.get('matkul')
-        prodi_id = request.GET.get('prodi')
-        tahun = request.GET.get('tahun')
+        # Filter Logic
+        kategori = request.GET.get('kategori')
+        status = request.GET.get('status')
         
-        if matkul: feedbacks = feedbacks.filter(mata_kuliah__icontains=matkul)
-        if prodi_id: feedbacks = feedbacks.filter(alumni__prodi_id=prodi_id)
-        if tahun: feedbacks = feedbacks.filter(alumni__tahun_lulus=tahun)
+        if kategori: feedbacks = feedbacks.filter(kategori=kategori)
+        if status: feedbacks = feedbacks.filter(status=status)
         
         context = {
             'feedbacks': feedbacks, 'is_admin': True,
-            'prodi_list': Prodi.objects.all(),
-            'tahun_list': Alumni.objects.values_list('tahun_lulus', flat=True).distinct()
+            'kategori_list': Feedback.KATEGORI_CHOICES, # Untuk Filter Dropdown
+            'status_list': Feedback.STATUS_CHOICES,
         }
         return render(request, 'feedback/feedback_list.html', context)
     
-    # MAHASISWA: Lihat Punya Sendiri
+    # MAHASISWA VIEW (My Data Only)
     else:
         if not hasattr(request.user, 'alumni'): return redirect('dashboard')
-        feedbacks = Feedback.objects.filter(alumni=request.user.alumni)
+        feedbacks = Feedback.objects.filter(alumni=request.user.alumni).order_by('-created_at')
         return render(request, 'feedback/feedback_list.html', {'feedbacks': feedbacks, 'is_admin': False})
 
 @login_required
 def feedback_create(request):
-    # SECURITY: Admin DILARANG Tambah Feedback
     if request.user.is_staff:
-        messages.error(request, "Admin tidak dapat mengisi feedback.")
         return redirect('feedback:list')
-
-    # Cek apakah user punya profil alumni
     if not hasattr(request.user, 'alumni'):
-        messages.error(request, "Profil alumni tidak ditemukan.")
         return redirect('dashboard')
 
     if request.method == 'POST':
         form = FeedbackForm(request.POST)
         if form.is_valid():
             fb = form.save(commit=False)
-            fb.alumni = request.user.alumni # Otomatis set Alumni
+            fb.alumni = request.user.alumni
             fb.save()
-            messages.success(request, "Feedback berhasil dikirim.")
+            messages.success(request, "Aspirasi Anda berhasil dikirim!")
             return redirect('feedback:list')
     else:
         form = FeedbackForm()
     
-    return render(request, 'feedback/feedback_form.html', {'form': form, 'title': 'Tambah Feedback'})
+    return render(request, 'feedback/feedback_form.html', {'form': form, 'title': 'Kirim Aspirasi Baru'})
 
 @login_required
 def feedback_edit(request, pk):
     fb = get_object_or_404(Feedback, pk=pk)
-
-    # SECURITY: Hanya Pemilik yang boleh edit
     if request.user.is_staff or fb.alumni.user != request.user:
-        messages.error(request, "Akses ditolak.")
         return redirect('feedback:list')
 
     if request.method == 'POST':
         form = FeedbackForm(request.POST, instance=fb)
         if form.is_valid():
             form.save()
-            messages.success(request, "Feedback diperbarui.")
+            messages.success(request, "Aspirasi diperbarui.")
             return redirect('feedback:list')
     else:
         form = FeedbackForm(instance=fb)
-
-    return render(request, 'feedback/feedback_form.html', {'form': form, 'title': 'Edit Feedback'})
+    return render(request, 'feedback/feedback_form.html', {'form': form, 'title': 'Edit Aspirasi'})
 
 @login_required
 def feedback_delete(request, pk):
     fb = get_object_or_404(Feedback, pk=pk)
-    
-    # SECURITY: Admin BOLEH, Pemilik BOLEH
     is_owner = (not request.user.is_staff and fb.alumni.user == request.user)
     if not (request.user.is_staff or is_owner):
         return redirect('feedback:list')
 
     if request.method == 'POST':
         fb.delete()
-        messages.success(request, "Feedback dihapus.")
+        messages.success(request, "Data dihapus.")
         return redirect('feedback:list')
-    
     return render(request, 'feedback/feedback_confirm_delete.html', {'object': fb})
