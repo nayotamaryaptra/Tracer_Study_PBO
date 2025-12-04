@@ -1,0 +1,11 @@
+# Abaikan folder virtual environment
+.venv/
+env/
+venv/
+__pycache__/
+
+# Abaikan database (opsional, kalau mau upload db hapus baris ini)
+*.sqlite3
+
+# Abaikan file sistem
+.DS_Store

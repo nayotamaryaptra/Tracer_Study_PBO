@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-success text-white border-0 py-4 px-4 bg-gradient">
+                <div class="d-flex align-items-center">
+                    <div class="bg-white bg-opacity-25 rounded-circle p-3 me-3">
+                        <i class="bi bi-chat-left-text-fill fs-3 text-white"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-1">{{ title|default:"Form Masukan Kurikulum" }}</h4>
+                        <p class="mb-0 small text-white-50">Pendapat Anda bersifat rahasia dan membangun.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body p-4 p-md-5">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {{ form|crispy }}
+
+                    <div class="d-flex justify-content-end gap-2 mt-5 pt-3 border-top">
+                        <a href="{% url 'feedback:list' %}" class="btn btn-light px-4 rounded-pill">Batal</a>
+                        <button type="submit" class="btn btn-success px-5 rounded-pill shadow">
+                            <i class="bi bi-paperplane-fill me-2"></i> Kirim Masukan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

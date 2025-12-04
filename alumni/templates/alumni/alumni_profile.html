@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-primary text-white text-center py-5 position-relative" style="background: linear-gradient(135deg, #3498db, #8e44ad);">
+                <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 20px 20px;"></div>
+                
+                <div class="bg-white text-primary rounded-circle d-inline-flex align-items-center justify-content-center shadow" style="width: 100px; height: 100px; font-size: 3rem; margin-bottom: -70px; position: relative; z-index: 2;">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+            </div>
+
+            <div class="card-body pt-5 px-5 pb-5">
+                <div class="text-center mt-3 mb-4">
+                    <h2 class="fw-bold mb-1">{{ alumni.nama }}</h2>
+                    <p class="text-muted mb-3"><i class="bi bi-mortarboard"></i> Alumni {{ alumni.tahun_lulus }}</p>
+                    
+                    {% if alumni.status_bekerja %}
+                        <span class="badge bg-success px-4 py-2 rounded-pill shadow-sm">
+                            <i class="bi bi-briefcase-fill"></i> Sudah Bekerja
+                        </span>
+                    {% else %}
+                        <span class="badge bg-secondary px-4 py-2 rounded-pill shadow-sm">
+                            <i class="bi bi-hourglass-split"></i> Belum Bekerja
+                        </span>
+                    {% endif %}
+                </div>
+
+                <hr class="opacity-10 my-4">
+
+                <div class="row g-4">
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 h-100 border border-light">
+                            <small class="text-muted d-block mb-1 text-uppercase fw-bold" style="font-size: 0.7rem;">Nomor Induk</small>
+                            <span class="fs-5 fw-medium text-dark">{{ alumni.nim }}</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 h-100 border border-light">
+                            <small class="text-muted d-block mb-1 text-uppercase fw-bold" style="font-size: 0.7rem;">Email Terdaftar</small>
+                            <span class="fs-5 fw-medium text-dark text-break">{{ alumni.email }}</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 h-100 border border-light">
+                            <small class="text-muted d-block mb-1 text-uppercase fw-bold" style="font-size: 0.7rem;">Fakultas</small>
+                            <span class="fs-5 fw-medium text-dark">{{ alumni.fakultas.nama }}</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 h-100 border border-light">
+                            <small class="text-muted d-block mb-1 text-uppercase fw-bold" style="font-size: 0.7rem;">Program Studi</small>
+                            <span class="fs-5 fw-medium text-dark">{{ alumni.prodi.nama }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-center">
+                    <div class="alert alert-info border-0 d-inline-block py-2 px-4 rounded-pill small">
+                        <i class="bi bi-info-circle me-1"></i> Data profil hanya dapat diubah oleh Administrator.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-primary">
+            <i class="bi bi-briefcase-fill"></i> Data Pekerjaan
+        </h2>
+        <p class="text-muted mb-0">
+            {% if is_admin %}
+                Monitoring sebaran karir alumni di berbagai perusahaan.
+            {% else %}
+                Riwayat karir profesional Anda setelah lulus.
+            {% endif %}
+        </p>
+    </div>
+    
+    {% if not is_admin %}
+        <a href="{% url 'survey:create' %}" class="btn btn-success shadow-sm px-4 rounded-pill">
+            <i class="bi bi-plus-lg me-1"></i> Tambah Riwayat
+        </a>
+    {% endif %}
+</div>
+
+{% if is_admin %}
+<div class="card border-0 shadow-sm mb-4 bg-white">
+    <div class="card-body py-3">
+        <form method="get" class="row g-2 align-items-center">
+            <div class="col-auto text-muted fw-bold small">
+                <i class="bi bi-funnel-fill"></i> FILTER DATA:
+            </div>
+            
+            <div class="col-md-3">
+                <select name="prodi" class="form-select form-select-sm border-0 bg-light fw-medium">
+                    <option value="">-- Semua Prodi --</option>
+                    {% for p in prodi_list %}
+                        <option value="{{ p.id }}" {% if request.GET.prodi == p.id|stringformat:"i" %}selected{% endif %}>
+                            {{ p.nama }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="tahun" class="form-select form-select-sm border-0 bg-light fw-medium">
+                    <option value="">-- Tahun Lulus --</option>
+                    {% for t in tahun_list %}
+                        <option value="{{ t }}" {% if request.GET.tahun == t|stringformat:"i" %}selected{% endif %}>
+                            {{ t }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-sm btn-primary px-3 rounded-pill shadow-sm">
+                    Terapkan
+                </button>
+                <a href="{% url 'survey:list' %}" class="btn btn-sm btn-link text-decoration-none text-muted">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<div class="card border-0 shadow rounded-4 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light text-uppercase small text-muted">
+                <tr>
+                    {% if is_admin %}
+                        <th class="py-3 ps-4">Alumni</th>
+                    {% endif %}
+                    <th class="py-3 {% if not is_admin %}ps-4{% endif %}">Perusahaan & Posisi</th>
+                    <th class="py-3 text-center">Tahun Masuk</th>
+                    <th class="py-3 text-center">Kesesuaian</th>
+                    <th class="py-3">Gaji</th>
+                    <th class="py-3 text-end pe-4">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in surveys %}
+                <tr>
+                    {% if is_admin %}
+                    <td class="ps-4">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-placeholder bg-light text-primary rounded-circle d-flex align-items-center justify-content-center me-2 border" style="width: 35px; height: 35px; font-weight: bold;">
+                                {{ s.alumni.nama|slice:":1" }}
+                            </div>
+                            <div>
+                                <span class="d-block fw-bold text-dark">{{ s.alumni.nama }}</span>
+                                <small class="text-muted" style="font-size: 0.75rem;">
+                                    {{ s.alumni.prodi.nama }} '{{ s.alumni.tahun_lulus }}
+                                </small>
+                            </div>
+                        </div>
+                    </td>
+                    {% endif %}
+
+                    <td class="{% if not is_admin %}ps-4{% endif %}">
+                        <div class="fw-bold text-dark">{{ s.perusahaan }}</div>
+                        <div class="text-primary small">
+                            <i class="bi bi-person-workspace"></i> {{ s.bidang_pekerjaan }}
+                        </div>
+                    </td>
+
+                    <td class="text-center text-muted fw-medium">{{ s.tahun_masuk }}</td>
+                    
+                    <td class="text-center">
+                        {% if s.kesesuaian == 'Sangat Sesuai' %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3">Sangat Sesuai</span>
+                        {% elif s.kesesuaian == 'Sesuai' %}
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3">Sesuai</span>
+                        {% elif s.kesesuaian == 'Kurang' %}
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3">Kurang</span>
+                        {% else %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3">Tidak Sesuai</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="fw-medium text-dark">Rp {{ s.gaji|intcomma }}</td>
+
+                    <td class="text-end pe-4">
+                        {% if not is_admin %}
+                            <a href="{% url 'survey:edit' s.pk %}" class="btn btn-sm btn-outline-warning border-0" title="Edit">
+                                <i class="bi bi-pencil-square fs-6"></i>
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'survey:delete' s.pk %}" class="btn btn-sm btn-outline-danger border-0" title="Hapus">
+                            <i class="bi bi-trash fs-6"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{% if is_admin %}6{% else %}5{% endif %}" class="text-center py-5">
+                        <div class="text-muted opacity-50 mb-2">
+                            <i class="bi bi-clipboard-x" style="font-size: 3rem;"></i>
+                        </div>
+                        <p class="text-muted mb-0">Belum ada data riwayat pekerjaan.</p>
+                        {% if not is_admin %}
+                            <a href="{% url 'survey:create' %}" class="btn btn-sm btn-primary mt-2 rounded-pill">
+                                Mulai Isi Data
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
