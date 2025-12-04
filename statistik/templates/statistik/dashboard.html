@@ -6,59 +6,88 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h2 class="fw-bold text-dark">
-            <i class="bi bi-graph-up-arrow text-primary"></i> Dashboard Statistik
+            <i class="bi bi-speedometer2 text-primary"></i> Dashboard Statistik
         </h2>
-        <p class="text-muted mb-0">Analisis tren karir alumni lintas angkatan.</p>
+        <p class="text-muted mb-0">Ringkasan performa alumni & keterserapan kerja.</p>
     </div>
     
     {% if is_admin %}
-    <a href="#" id="btnExport" class="btn btn-outline-danger shadow-sm px-4 rounded-pill">
-        <i class="bi bi-file-earmark-pdf-fill me-2"></i> Export PDF
-    </a>
+    <div class="d-flex gap-2">
+        <form method="get" class="d-flex gap-2">
+            <select name="prodi" class="form-select form-select-sm border-0 shadow-sm bg-white fw-medium" style="min-width: 150px;">
+                <option value="">-- Semua Prodi --</option>
+                {% for p in prodi_list %}
+                    <option value="{{ p.id }}" {% if request.GET.prodi == p.id|stringformat:"i" %}selected{% endif %}>{{ p.nama }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-sm btn-primary rounded-circle shadow-sm"><i class="bi bi-funnel-fill"></i></button>
+        </form>
+
+        <a href="#" id="btnExport" class="btn btn-danger btn-sm shadow-sm px-3 rounded-pill d-flex align-items-center">
+            <i class="bi bi-file-earmark-pdf-fill me-2"></i> PDF
+        </a>
+    </div>
     {% endif %}
 </div>
 
-<div class="row g-4 mb-5">
-    
-    <div class="col-md-7">
-        <div class="card border-0 shadow-lg rounded-4 h-100 overflow-hidden">
-            <div class="card-header bg-white border-0 pt-4 px-4">
-                <div class="d-flex align-items-center">
-                    <div class="icon-sq bg-primary bg-opacity-10 text-primary rounded-3 p-2 me-3">
-                        <i class="bi bi-bezier2"></i>
-                    </div>
-                    <div>
-                        <h5 class="fw-bold text-dark mb-0">Tren Keterserapan Lulusan</h5>
-                        <small class="text-muted">Jumlah alumni yang bekerja per tahun angkatan.</small>
-                    </div>
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+            <div class="card-body p-4 d-flex align-items-center">
+                <div class="icon-sq bg-primary bg-opacity-10 text-primary rounded-4 p-3 me-3">
+                    <i class="bi bi-people-fill fs-3"></i>
                 </div>
-            </div>
-            <div class="card-body p-4">
-                <div style="height: 300px; width: 100%;">
-                    <canvas id="chartTrend"></canvas>
+                <div>
+                    <h6 class="text-muted text-uppercase fw-bold small mb-1">Total Alumni</h6>
+                    <h2 class="fw-bold text-dark mb-0">{{ kpi_alumni }}</h2>
                 </div>
             </div>
         </div>
     </div>
-    
-    <div class="col-md-5">
-        <div class="card border-0 shadow-lg rounded-4 h-100 overflow-hidden">
-            <div class="card-header bg-white border-0 pt-4 px-4">
-                <div class="d-flex align-items-center">
-                    <div class="icon-sq bg-success bg-opacity-10 text-success rounded-3 p-2 me-3">
-                        <i class="bi bi-pie-chart-fill"></i>
-                    </div>
-                    <div>
-                        <h5 class="fw-bold text-dark mb-0">Relevansi Studi</h5>
-                        <small class="text-muted">Tingkat kesesuaian pekerjaan.</small>
-                    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+            <div class="card-body p-4 d-flex align-items-center">
+                <div class="icon-sq bg-success bg-opacity-10 text-success rounded-4 p-3 me-3">
+                    <i class="bi bi-check-circle-fill fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted text-uppercase fw-bold small mb-1">Responden Survey</h6>
+                    <h2 class="fw-bold text-dark mb-0">{{ kpi_responden }}</h2>
+                    <small class="text-success small"><i class="bi bi-arrow-up-short"></i> Sudah Bekerja</small>
                 </div>
             </div>
-            <div class="card-body p-4 d-flex align-items-center justify-content-center">
-                <div style="height: 280px; width: 280px;">
-                    <canvas id="chartPolar"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+            <div class="card-body p-4 d-flex align-items-center">
+                <div class="icon-sq bg-warning bg-opacity-10 text-warning rounded-4 p-3 me-3">
+                    <i class="bi bi-star-fill fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted text-uppercase fw-bold small mb-1">Skor Relevansi</h6>
+                    <h2 class="fw-bold text-dark mb-0">{{ kpi_relevansi }}%</h2>
+                    <small class="text-muted small">Sesuai Bidang Studi</small>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-lg rounded-4 mb-5 overflow-hidden">
+    <div class="card-header bg-white border-0 pt-4 px-4">
+        <div class="d-flex align-items-center">
+            <div class="icon-sq bg-info bg-opacity-10 text-info rounded-2 p-1 me-2">
+                <i class="bi bi-graph-up"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-0">Tren Keterserapan Lulusan</h5>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <div style="height: 350px; width: 100%;">
+            <canvas id="chartTrend"></canvas>
         </div>
     </div>
 </div>
@@ -71,7 +100,7 @@
             </div>
             <div>
                 <h5 class="mb-0 fw-bold">Top Salary by Program Studi</h5>
-                <small class="text-white-50" style="font-size: 0.75rem;">Peringkat gaji tertinggi berdasarkan alumni.</small>
+                <small class="text-white-50">Peringkat gaji tertinggi berdasarkan alumni.</small>
             </div>
         </div>
     </div>
@@ -91,32 +120,21 @@
                 <tr>
                     <td class="ps-4">
                         {% if forloop.counter == 1 %}
-                            <img src="https://cdn-icons-png.flaticon.com/512/2583/2583344.png" width="30" alt="Gold">
+                            <img src="https://cdn-icons-png.flaticon.com/512/2583/2583344.png" width="30">
                         {% elif forloop.counter == 2 %}
-                            <img src="https://cdn-icons-png.flaticon.com/512/2583/2583319.png" width="30" alt="Silver">
+                            <img src="https://cdn-icons-png.flaticon.com/512/2583/2583319.png" width="30">
                         {% elif forloop.counter == 3 %}
-                            <img src="https://cdn-icons-png.flaticon.com/512/2583/2583434.png" width="30" alt="Bronze">
+                            <img src="https://cdn-icons-png.flaticon.com/512/2583/2583434.png" width="30">
                         {% else %}
                             <span class="badge bg-light text-secondary border rounded-circle shadow-sm">{{ forloop.counter }}</span>
                         {% endif %}
                     </td>
-                    <td>
-                        <span class="fw-bold text-dark d-block">{{ p.nama }}</span>
-                        <small class="text-muted">{{ p.fakultas.nama }}</small>
-                    </td>
-                    <td class="text-end">
-                        <span class="badge bg-success-subtle text-success px-3 rounded-pill font-monospace border border-success-subtle">
-                            Rp {{ p.max_gaji|intcomma }}
-                        </span>
-                    </td>
-                    <td class="text-end pe-4 font-monospace text-muted fw-medium">
-                        Rp {{ p.avg_gaji|intcomma }}
-                    </td>
+                    <td><span class="fw-bold text-dark">{{ p.nama }}</span></td>
+                    <td class="text-end"><span class="badge bg-success-subtle text-success px-3 rounded-pill font-monospace">Rp {{ p.max_gaji|intcomma }}</span></td>
+                    <td class="text-end pe-4 font-monospace text-muted">Rp {{ p.avg_gaji|intcomma }}</td>
                 </tr>
                 {% empty %}
-                <tr>
-                    <td colspan="4" class="text-center py-5 text-muted">Belum ada data gaji yang masuk.</td>
-                </tr>
+                <tr><td colspan="4" class="text-center py-5 text-muted">Belum ada data gaji.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -127,14 +145,12 @@
 
 {% block extra_js %}
 <script>
-    // Pastikan Chart.js sudah terload sebelum kode ini jalan
-    
-    // 1. CONFIG LINE CHART (TREN)
+    // CONFIG LINE CHART
     const ctxTrend = document.getElementById('chartTrend');
     if (ctxTrend) {
         const gradient = ctxTrend.getContext('2d').createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(52, 152, 219, 0.5)'); 
-        gradient.addColorStop(1, 'rgba(52, 152, 219, 0.0)'); 
+        gradient.addColorStop(0, 'rgba(13, 110, 253, 0.5)'); 
+        gradient.addColorStop(1, 'rgba(13, 110, 253, 0.0)'); 
 
         const chartLabels = {{ chart_years|default:"[]"|safe }};
         const chartData = {{ chart_trend_data|default:"[]"|safe }};
@@ -146,11 +162,14 @@
                 datasets: [{
                     label: 'Alumni Bekerja',
                     data: chartData, 
-                    borderColor: '#3498db', 
+                    borderColor: '#0d6efd', 
                     backgroundColor: gradient, 
                     borderWidth: 3,
                     fill: true, 
-                    tension: 0.4 
+                    tension: 0.4,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#0d6efd',
+                    pointRadius: 5
                 }]
             },
             options: {
@@ -165,46 +184,10 @@
         });
     }
 
-    // 2. CONFIG POLAR CHART (KESESUAIAN)
-    const ctxPolar = document.getElementById('chartPolar');
-    if (ctxPolar) {
-        const polarLabels = {{ chart_label_kesesuaian|default:"[]"|safe }};
-        const polarData = {{ chart_data_kesesuaian|default:"[]"|safe }};
-
-        new Chart(ctxPolar, {
-            type: 'polarArea', 
-            data: {
-                labels: polarLabels,
-                datasets: [{
-                    data: polarData,
-                    backgroundColor: [
-                        'rgba(46, 204, 113, 0.7)', 
-                        'rgba(52, 152, 219, 0.7)', 
-                        'rgba(241, 196, 15, 0.7)', 
-                        'rgba(231, 76, 60, 0.7)'   
-                    ],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    r: { ticks: { display: false }, grid: { color: '#f0f0f0' } } 
-                },
-                plugins: {
-                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
-                }
-            }
-        });
-    }
-
-    // Script Update Link Export PDF
+    // Export PDF Link Logic
     const btnExport = document.getElementById('btnExport');
-    
     if(btnExport) {
         function updateExportLink() {
-            // Ambil parameter filter dari URL browser
             const params = new URLSearchParams(window.location.search);
             btnExport.href = `{% url 'statistik:export_pdf' %}?` + params.toString();
         }
