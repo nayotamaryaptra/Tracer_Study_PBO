@@ -44,7 +44,7 @@ Supaya library tidak bentrok dengan project lain, buat lingkungan virtual.
 Untuk Windows:
 ```bash
 python -m venv Env
-.venv\Scripts\activate
+Env\Scripts\activate
 ```
 (Jika muncul error "Script is disabled", jalankan: Set-ExecutionPolicy RemoteSigned -Scope Process)
 
